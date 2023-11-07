@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 	SpriteBatch batch;
@@ -20,6 +21,11 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 	BitmapFont font;
 	FreeTypeFontGenerator fontGenerator;
 
+	int lives = 4;
+	int score = 0;
+
+	private double currentTime;
+	private double gameOverTime = -1.0f;
 
 	@Override
 	public void create () {
@@ -45,6 +51,25 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 	public void render () {
 		batch.begin();
 		batch.draw(background,0,0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+
+		double newTime = TimeUtils.millis() / 1000.0;
+		System.out.println("newTime: " + newTime);
+		double frameTime = Math.min(newTime - currentTime,0.3); //render zamanı kullanılan telefona göre degisebilir
+		System.out.println("frameTime: " + frameTime);
+		float deltaTime = (float) frameTime;
+		System.out.println("deltaTime: " + deltaTime);
+		currentTime = newTime;
+
+		if (lives <= 0 && gameOverTime == 0f){
+			//game over
+			gameOverTime = currentTime;
+		}
+		if (lives > 0){
+			//game mode
+			for (int i = 0; i<lives; i++){
+				batch.draw(apple,i*30f+20f,Gdx.graphics.getHeight()-30f,30f,30f);
+			}
+		}
 		font.draw(batch,"Score: 0",30,40);
 		font.draw(batch,"Cut to play",Gdx.graphics.getWidth()*0.5f,Gdx.graphics.getHeight()*0.5f);
 		batch.end();
