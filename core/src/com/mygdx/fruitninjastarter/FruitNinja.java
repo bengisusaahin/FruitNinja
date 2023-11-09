@@ -31,6 +31,10 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 	int lives = 4;
 	int score = 0;
 
+	float genCounter = 0;
+	private final float startGenSpeed = 1.1f;
+	float genSpeed = startGenSpeed;
+
 	private double currentTime;
 	private double gameOverTime = -1.0f;
 
@@ -68,14 +72,24 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 		System.out.println("deltaTime: " + deltaTime);
 		currentTime = newTime;
 
-		addItem();
-
 		if (lives <= 0 && gameOverTime == 0f){
 			//game over
 			gameOverTime = currentTime;
 		}
 		if (lives > 0){
 			//game mode
+
+			genSpeed -= deltaTime * 0.015f;
+
+			System.out.println("genSpeed: " + genSpeed);
+			System.out.println("genCounter: " + genCounter);
+			if (genCounter <= 0f){
+				genCounter = genSpeed;
+				addItem();
+			}else {
+				genCounter -= deltaTime;
+			}
+
 			for (int i = 0; i<lives; i++){
 				batch.draw(apple,i*30f+20f,Gdx.graphics.getHeight()-30f,30f,30f);
 			}

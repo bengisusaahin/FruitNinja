@@ -1,5 +1,6 @@
 package com.mygdx.fruitninjastarter;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class Fruit {
@@ -31,6 +32,9 @@ public class Fruit {
     }
 
     public void update(float deltaTime){
+        velocity.y -= deltaTime * (Gdx.graphics.getHeight() * 0.2f);
+        velocity.x -= deltaTime * Math.signum(velocity.x) * 5f;
+
         pos.mulAdd(velocity,deltaTime);
     }
 }
