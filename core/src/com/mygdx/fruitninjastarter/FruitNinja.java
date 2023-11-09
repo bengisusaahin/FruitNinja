@@ -68,6 +68,8 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 		System.out.println("deltaTime: " + deltaTime);
 		currentTime = newTime;
 
+		addItem();
+
 		if (lives <= 0 && gameOverTime == 0f){
 			//game over
 			gameOverTime = currentTime;
@@ -77,6 +79,25 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 			for (int i = 0; i<lives; i++){
 				batch.draw(apple,i*30f+20f,Gdx.graphics.getHeight()-30f,30f,30f);
 			}
+
+			for (Fruit fruit : fruitArray){
+				fruit.update(deltaTime);
+
+				switch (fruit.type){
+					case REGULAR:
+						batch.draw(apple,fruit.getPos().x, fruit.getPos().y, Fruit.radius,Fruit.radius);
+						break;
+					case EXTRA:
+						batch.draw(cherry,fruit.getPos().x, fruit.getPos().y, Fruit.radius,Fruit.radius);
+						break;
+					case ENEMY:
+						batch.draw(ruby,fruit.getPos().x, fruit.getPos().y, Fruit.radius,Fruit.radius);
+						break;
+					case LIFE:
+						batch.draw(bill,fruit.getPos().x, fruit.getPos().y, Fruit.radius,Fruit.radius);
+						break;
+				}
+			}
 		}
 		font.draw(batch,"Score: 0",30,40);
 		font.draw(batch,"Cut to play",Gdx.graphics.getWidth()*0.5f,Gdx.graphics.getHeight()*0.5f);
@@ -85,7 +106,8 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 
 	private void addItem(){
 		float pos = random.nextFloat() * Math.max(Gdx.graphics.getHeight(), Gdx.graphics.getWidth());
-		Fruit item = new Fruit(new Vector2(pos, pos), new Vector2(pos,pos));
+		Fruit item = new Fruit(new Vector2(pos, -Fruit.radius), new Vector2((Gdx.graphics.
+				getWidth() * 0.5f) * (random.nextFloat()),Gdx.graphics.getHeight() * 0.5f));
 
 		float type = random.nextFloat();
 		if (type > 0.98){
