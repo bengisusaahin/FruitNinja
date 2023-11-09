@@ -28,7 +28,7 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 	Random random = new Random();
 	Array<Fruit> fruitArray = new Array<Fruit>();
 
-	int lives = 4;
+	int lives = 0;
 	int score = 0;
 
 	float genCounter = 0;
@@ -113,15 +113,18 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 				}
 			}
 		}
-		font.draw(batch,"Score: 0",30,40);
-		font.draw(batch,"Cut to play",Gdx.graphics.getWidth()*0.5f,Gdx.graphics.getHeight()*0.5f);
+		font.draw(batch,"Score: "+score,30,40);
+		if (lives <= 0){
+			font.draw(batch,"Cut to play",Gdx.graphics.getWidth()*0.5f,Gdx.graphics.getHeight()*0.5f);
+
+		}
 		batch.end();
 	}
 
 	private void addItem(){
 		float pos = random.nextFloat() * Math.max(Gdx.graphics.getHeight(), Gdx.graphics.getWidth());
 		Fruit item = new Fruit(new Vector2(pos, -Fruit.radius), new Vector2((Gdx.graphics.
-				getWidth() * 0.5f) * (random.nextFloat()),Gdx.graphics.getHeight() * 0.5f));
+				getWidth() * 0.5f - pos) * (0.3f + (random.nextFloat()-0.5f)),Gdx.graphics.getHeight() * 0.5f));
 
 		float type = random.nextFloat();
 		if (type > 0.98){
@@ -174,6 +177,51 @@ public class FruitNinja extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if (lives <= 0 && currentTime - gameOverTime > 2f){
+			//menu mode
+			gameOverTime = 0f;
+			score = 0;
+			lives = 4;
+			genSpeed = startGenSpeed;
+			fruitArray.clear();
+		}else {
+			//game mode
+			Array<Fruit> toRemove = new Array<Fruit>();
+			Vector2 pos = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
+			//pos kullanıcının tıkladıgı ya da cizdigi yer
+			int plusScore = 0;
+			for (Fruit f : fruitArray){
+				System.out.println("distance: " + pos.dst2(f.pos)); //kullanıcının tıkladıgı yerin meyveye uzaklığı
+				System.out.println("distance: " + f.clicked(pos));
+				System.out.println("distance: " + Fruit.radius * Fruit.radius + 1);
+
+				if (f.clicked(pos)){
+					toRemove.add(f);
+
+					switch (f.type){
+						case REGULAR:
+							plusScore++;
+							break;
+						case EXTRA:
+							plusScore+=2;
+							score++;
+							break;
+						case ENEMY:
+							lives--;
+							break;
+						case LIFE:
+							lives++;
+							break;
+					}
+				}
+			}
+
+			score += plusScore * plusScore;
+
+			for (Fruit f : toRemove){
+				fruitArray.removeValue(f,true);
+			}
+		}
 		return false;
 	}
 
